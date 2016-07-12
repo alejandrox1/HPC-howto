@@ -60,9 +60,18 @@ case "$flag" in
 		;;
         "sdsc")
                 cluster=comet
-                files=/oasis/scratch/comet/alarcj/temp_project/AMINO/data/op_run
-                partition=compute
-                echo "Running on comet.sdsc.xsede.org"
+		partition=compute
+		cpern=24
+
+		echo "Running on comet.sdsc.xsede.org"
+
+                runfiles=/oasis/scratch/comet/alarcj/temp_project/
+                structures=/oasis/scratch/comet/alarcj/temp_project/CHAINS
+		cp ${runfiles}/raman_run_blyp-pcs0.sh .
+                cp ${runfiles}/restart_raman.sh .
+                cp ${runfiles}/blyp-pcs0_acetylene.nw .
+                cp ${runfiles}/acetylene_restart.nw .
+                cp ${structures}/c${length}.xyz .
                 ;;
         *)
                 echo "Unkown option."
@@ -79,11 +88,18 @@ esac
 sed -i "s/monomer/c${length}/g" blyp-pcs0_acetylene.nw
 sed -i "s/monomer/c${length}/g" acetylene_restart.nw
 
-
-sbatch -A $allocation -p $partition -N $nodes -n $procs -J c${length} raman_run_blyp-pcs0.sh $procs > submit.txt
-id=`awk 'END {print $NF}' submit.txt`
-sbatch -A $allocation --dependency=afterok:${id} -p $partition -N $nodes -n $procs -J c${length} restart_raman.sh $procs
-
+case  "$cluster" in
+                "comet")
+			sbatch -A $allocation --export=NONE --no-requeue -p $partition -N $nodes -n $procs -J c${length} raman_run_blyp-pcs0.sh $procs > submit.txt
+			id=`awk 'END {print $NF}' submit.txt`
+			sbatch -A $allocation --dependency=afterok:${id} --export=NONE --no-requeue -p $partition -N $nodes -n $procs -J c${length} restart_raman.sh $procs
+			 ;;
+                "stampede")
+			sbatch -A $allocation -p $partition -N $nodes -n $procs -J c${length} raman_run_blyp-pcs0.sh $procs > submit.txt
+                        id=`awk 'END {print $NF}' submit.txt`
+                        sbatch -A $allocation --dependency=afterok:${id} -p $partition -N $nodes -n $procs -J c${length} restart_raman.sh $procs
+			;;
+esac
 
 
 # FOR debugging purposes
