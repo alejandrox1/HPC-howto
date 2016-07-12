@@ -1,0 +1,12 @@
+echo
+
+restart monomer
+
+task dft raman numerical
+
+freq 
+ reuse
+ temp 1 0.0
+end
+
+task dft freq

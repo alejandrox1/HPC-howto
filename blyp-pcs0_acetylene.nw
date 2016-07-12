@@ -1,0 +1,50 @@
+echo
+
+start monomer
+
+title "TDDFT monomer BLYP/pcs0"
+
+geometry units angstroms
+load monomer.xyz
+end
+
+basis  spherical
+ * library pcS-0
+end
+
+dft
+ xc becke88 lyp
+ direct
+ convergence nolevelshifting
+ tolerances tight
+ iterations 1000
+end
+
+hessian 
+ thresh 1d-8
+ profile 
+end
+
+property
+ response  1 8.8559E-2
+ damping 0.007
+end
+
+raman
+ normal
+end
+
+driver
+ maxiter 30
+ xyz opt
+end
+
+task dft optimize
+task dft raman numerical
+
+freq 
+ reuse
+ temp 1 0.0
+end
+
+task dft freq numerical
