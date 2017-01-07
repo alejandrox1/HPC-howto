@@ -3,8 +3,8 @@
 #-
 #-      bash run_blyp-pcs0.sh -N numbernodes -np numberoftasks -c chainlength
 #-
-#- 	comet has 24 nodes per core.
-#-      stampede has 16 nodes per core.
+#- 	comet has 24 cores per node.
+#-      stampede has 16 cores per node.
 
 allocation=XXXXXXXXXXXXX
 
